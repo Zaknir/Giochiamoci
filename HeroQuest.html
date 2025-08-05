@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroQuest - Estrattore di Carte</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e2a38;
+            /* Sfondo scuro, meno aggressivo */
+            color: #f2f2f2;
+            /* Testo chiaro, più morbido */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-size: 1.2em;
+            line-height: 1.8;
+            word-spacing: 0.1em;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #2c3e50;
+            /* Contenitore leggermente più scuro del testo per maggiore profondità */
+            padding: 30px 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #45b29d;
+            /* Ciano/verde acqua per il titolo */
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            color: #bdc3c7;
+            margin-top: 0;
+        }
+
+        .card {
+            background-color: #1e2a38;
+            border: 2px solid #45b29d;
+            /* Bordo del ciano/verde acqua */
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card h3 {
+            color: #f39c12;
+            /* Arancione per i titoli delle carte */
+            margin-top: 0;
+        }
+
+        .card p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        button {
+            background-color: #45b29d;
+            /* Ciano/verde acqua per i pulsanti */
+            color: #f2f2f2;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #388f7b;
+            /* Versione leggermente più scura al passaggio del mouse */
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            /* Grigio neutro per i pulsanti disabilitati */
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>HeroQuest</h1>
+        <h2>Estrattore di Carte del Tesoro</h2>
+
+        <button id="draw-button">Pesca una Carta</button>
+
+        <div id="card-display" class="card" aria-live="polite">
+            <p><b>Mazzo pronto!</b><br>
+                Ci sono <span id="initial-cards-count"></span> carte da pescare.
+            </p>
+        </div>
+
+        <button id="reset-button">Resetta il Mazzo</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const cardDefinitions = [
+                { nome: "Acqua Benedetta", descrizione: "Uccide istantaneamente un non morto.", quantità: 1, tipo: "oggetto" },
+                { nome: "Gemma", descrizione: "Una pietra preziosa del valore di 50 monete.", quantità: 1, tipo: "oro" },
+                { nome: "Gioielli", descrizione: "Un bauletto contenente preziosi del valore di 50 monete.", quantità: 1, tipo: "oro" },
+                { nome: "Infuso Eroico", descrizione: "Il tuo eroe può effettuare due attacchi questo turno.", quantità: 1, tipo: "oggetto" },
+                { nome: "Mostro Errante", descrizione: "Un mostro compare in un riquadro adiacente e ti attacca!", quantità: 5, tipo: "sfortuna" },
+                { nome: "Niente", descrizione: "Nonostante tu abbia cercato ovunque, non hai trovato nulla.", quantità: 1, tipo: "oggetto" },
+                { nome: "Oro", descrizione: "Un borsello contenente 10 monete.", quantità: 2, tipo: "oro" },
+                { nome: "Oro", descrizione: "Un borsello contenente 20 monete.", quantità: 1, tipo: "oro" },
+                { nome: "Oro", descrizione: "Un borsello contenente 25 monete.", quantità: 2, tipo: "oro" },
+                { nome: "Oro", descrizione: "Un borsello contenente 50 monete.", quantità: 1, tipo: "oro" },
+                { nome: "Pozione di Recupero", descrizione: "Il tuo eroe può tirare due dadi aggiuntivi quando si difende dal prossimo attacco.", quantità: 1, tipo: "oggetto" },
+                { nome: "Pozione di Rapidità", descrizione: "Il tuo eroe può tirare il doppio dei dadi per il suo prossimo movimento.", quantità: 1, tipo: "oggetto" },
+                { nome: "Pozione di Rinforzo", descrizione: "Il tuo eroe può tirare due dadi aggiuntivi quando effettua il prossimo attacco.", quantità: 1, tipo: "oggetto" },
+                { nome: "Pozione Risanante", descrizione: "Il tuo eroe recupera 4 Punti Corpo persi.", quantità: 2, tipo: "oggetto" },
+                { nome: "Trabocchetto", descrizione: "Il tuo eroe perde 1 Punto Corpo!", quantità: 1, tipo: "sfortuna" },
+                { nome: "Trappola", descrizione: "Il tuo eroe perde 1 Punto Corpo!", quantità: 2, tipo: "sfortuna" },
+                { nome: "Tesoro!", descrizione: "Un forziere contenente preziosi del valore di 100 monete.", quantità: 1, tipo: "oro" }
+            ];
+
+            let availableCards = [];
+            let drawnCard = null;
+
+            const drawButton = document.getElementById('draw-button');
+            const resetButton = document.getElementById('reset-button');
+            const cardDisplay = document.getElementById('card-display');
+
+            function buildDeck() {
+                availableCards = [];
+                cardDefinitions.forEach(card => {
+                    for (let i = 0; i < card.quantità; i++) {
+                        availableCards.push(card);
+                    }
+                });
+            }
+
+            function drawCard() {
+                if (availableCards.length === 0) {
+                    cardDisplay.innerHTML = `<p><b>Mazzo Vuoto!</b><br>Non ci sono più carte da pescare. Clicca su 'Resetta il Mazzo' per ricominciare.</p>`;
+                    drawButton.disabled = true;
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * availableCards.length);
+                drawnCard = availableCards[randomIndex];
+
+                let cardMessage = '';
+                // **Logica aggiornata per i nuovi tipi di carte**
+                if (drawnCard.tipo === 'sfortuna') {
+                    cardMessage = '<br><br><b>Carta rimessa nel mazzo.</b>';
+                } else if (drawnCard.tipo === 'oro') {
+                    cardMessage = '<br><br><b>Segna il suo valore sulla scheda.</b>';
+                    availableCards.splice(randomIndex, 1);
+                } else if (drawnCard.tipo === 'oggetto') {
+                    cardMessage = '<br><br><b>Scartala dopo averla usata.</b>';
+                    availableCards.splice(randomIndex, 1);
+                }
+
+                const remainingCount = availableCards.length;
+                cardDisplay.innerHTML = `<p><b>${drawnCard.nome}</b><br><br>${drawnCard.descrizione}${cardMessage}<br><br>Carte rimanenti: ${remainingCount}</p>`;
+            }
+
+            function resetDeck() {
+                buildDeck();
+                drawButton.disabled = false;
+                const remainingCount = availableCards.length;
+                cardDisplay.innerHTML = `<p><b>Mazzo resettato!</b><br>Il mazzo è stato rimescolato.<br><br>Carte rimanenti: ${remainingCount}</p>`;
+            }
+
+            drawButton.addEventListener('click', drawCard);
+            resetButton.addEventListener('click', resetDeck);
+
+            buildDeck();
+            document.getElementById('initial-cards-count').textContent = availableCards.length;
+        });
+    </script>
+</body>
+
+</html>
