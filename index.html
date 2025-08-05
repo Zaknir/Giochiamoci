@@ -102,15 +102,13 @@
         <h2>Estrattore di Carte del Tesoro</h2>
 
         <div id="card-display" class="card" aria-live="polite">
-            <p><b>Pesca la Prima Carta</b><br>Clicca sul pulsante qui sotto per estrarre una carta del tesoro casuale.</p>
+            <p><b>Mazzo pronto!</b><br>
+            Ci sono <span id="initial-cards-count"></span> carte da pescare.
+            </p>
         </div>
 
         <button id="draw-button">Pesca una Carta</button>
         <button id="reset-button">Resetta il Mazzo</button>
-
-        <div class="status-container">
-            <p>Carte rimanenti: <span id="remaining-cards">25</span></p>
-        </div>
     </div>
 
     <script>
@@ -142,8 +140,8 @@
             const drawButton = document.getElementById('draw-button');
             const resetButton = document.getElementById('reset-button');
             const cardDisplay = document.getElementById('card-display');
-            const remainingCardsSpan = document.getElementById('remaining-cards');
 
+            // Funzione per costruire il mazzo completo
             function buildDeck() {
                 availableCards = [];
                 cardDefinitions.forEach(card => {
@@ -153,13 +151,10 @@
                 });
             }
 
-            function updateRemainingCards() {
-                remainingCardsSpan.textContent = availableCards.length;
-            }
-
+            // Funzione per estrarre una carta
             function drawCard() {
                 if (availableCards.length === 0) {
-                    cardDisplay.innerHTML = `<h3>Mazzo Vuoto!</h3><p>Non ci sono più carte da pescare. Clicca su 'Resetta il Mazzo' per ricominciare.</p>`;
+                    cardDisplay.innerHTML = `<p><b>Mazzo Vuoto!</b><br>Non ci sono più carte da pescare. Clicca su 'Resetta il Mazzo' per ricominciare.</p>`;
                     drawButton.disabled = true;
                     return;
                 }
@@ -167,29 +162,33 @@
                 const randomIndex = Math.floor(Math.random() * availableCards.length);
                 drawnCard = availableCards[randomIndex];
 
-                cardDisplay.innerHTML = `<p><b>${drawnCard.nome}</b><br>${drawnCard.descrizione}</p>`;
-
+                // **LOGICA AGGIORNATA:** gestisce la rimozione della carta
                 if (drawnCard.tipo !== 'speciale') {
                     availableCards.splice(randomIndex, 1);
                 }
 
-                updateRemainingCards();
+                // Genera il contenuto della carta e il contatore in un'unica stringa
+                const remainingCount = availableCards.length;
+                cardDisplay.innerHTML = `<p><b>${drawnCard.nome}</b><br>${drawnCard.descrizione}<br><br>Carte rimanenti: ${remainingCount}</p>`;
             }
 
+            // Funzione per resettare il mazzo
             function resetDeck() {
                 buildDeck();
                 drawButton.disabled = false;
-                cardDisplay.innerHTML = `<h3>Mazzo resettato!</h3><p>Il mazzo è stato rimescolato. Pesca la tua prossima carta!</p>`;
-                updateRemainingCards();
+                const remainingCount = availableCards.length;
+                cardDisplay.innerHTML = `<p><b>Mazzo resettato!</b><br>Il mazzo è stato rimescolato.<br><br>Carte rimanenti: ${remainingCount}</p>`;
             }
 
             drawButton.addEventListener('click', drawCard);
             resetButton.addEventListener('click', resetDeck);
 
+            // Inizializza il mazzo e aggiorna il conteggio iniziale
             buildDeck();
-            updateRemainingCards();
+            document.getElementById('initial-cards-count').textContent = availableCards.length;
         });
     </script>
 </body>
 
 </html>
+
