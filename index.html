@@ -8,10 +8,8 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #1e2a38;
-            /* Sfondo scuro, meno aggressivo */
-            color: #f2f2f2;
-            /* Testo chiaro, più morbido */
+            background-color: #f5f5dc; /* Sfondo "pergamena" */
+            color: #333; /* Testo scuro, per un alto contrasto */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,8 +23,7 @@
 
         .container {
             text-align: center;
-            background-color: #2c3e50;
-            /* Contenitore leggermente più scuro del testo per maggiore profondità */
+            background-color: #f8f8e8; /* Contenitore leggermente più chiaro per distinzione */
             padding: 30px 50px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -35,20 +32,18 @@
         }
 
         h1 {
-            color: #45b29d;
-            /* Ciano/verde acqua per il titolo */
+            color: #654321; /* Marrone scuro per il titolo */
             margin-bottom: 5px;
         }
 
         h2 {
-            color: #bdc3c7;
+            color: #6c7b8b; /* Grigio-blu per il sottotitolo */
             margin-top: 0;
         }
 
         .card {
-            background-color: #1e2a38;
-            border: 2px solid #45b29d;
-            /* Bordo del ciano/verde acqua */
+            background-color: #f5f5dc; /* Sfondo della carta come la pergamena */
+            border: 2px solid #654321; /* Bordo marrone scuro */
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -59,8 +54,7 @@
         }
 
         .card h3 {
-            color: #f39c12;
-            /* Arancione per i titoli delle carte */
+            color: #b16c17; /* Tonalità di marrone per i titoli delle carte */
             margin-top: 0;
         }
 
@@ -70,8 +64,7 @@
         }
 
         button {
-            background-color: #45b29d;
-            /* Ciano/verde acqua per i pulsanti */
+            background-color: #8b4513; /* Marrone sella per i pulsanti */
             color: #f2f2f2;
             border: none;
             padding: 12px 25px;
@@ -84,13 +77,11 @@
         }
 
         button:hover {
-            background-color: #388f7b;
-            /* Versione leggermente più scura al passaggio del mouse */
+            background-color: #654321; /* Marrone scuro al passaggio del mouse */
         }
 
         button:disabled {
-            background-color: #6c757d;
-            /* Grigio neutro per i pulsanti disabilitati */
+            background-color: #ccc; /* Grigio chiaro per i pulsanti disabilitati */
             cursor: not-allowed;
         }
     </style>
@@ -163,19 +154,18 @@
                 drawnCard = availableCards[randomIndex];
 
                 let cardMessage = '';
-                // **Logica aggiornata per i nuovi tipi di carte**
                 if (drawnCard.tipo === 'sfortuna') {
-                    cardMessage = '<br><br><b>Carta rimessa nel mazzo.</b>';
+                    cardMessage = '<br><b>Carta rimessa nel mazzo.</b>';
                 } else if (drawnCard.tipo === 'oro') {
-                    cardMessage = '<br><br><b>Segna il suo valore sulla scheda.</b>';
+                    cardMessage = '<br><b>Segna il suo valore sulla scheda.</b>';
                     availableCards.splice(randomIndex, 1);
                 } else if (drawnCard.tipo === 'oggetto') {
-                    cardMessage = '<br><br><b>Scartala dopo averla usata.</b>';
+                    cardMessage = '<br><b>Scartala dopo averla usata.</b>';
                     availableCards.splice(randomIndex, 1);
                 }
 
                 const remainingCount = availableCards.length;
-                cardDisplay.innerHTML = `<p><b>${drawnCard.nome}</b><br><br>${drawnCard.descrizione}${cardMessage}<br><br>Carte rimanenti: ${remainingCount}</p>`;
+                cardDisplay.innerHTML = `<p><b>${drawnCard.nome}</b><br>${drawnCard.descrizione}${cardMessage}<br><br>Carte rimanenti: ${remainingCount}</p>`;
             }
 
             function resetDeck() {
