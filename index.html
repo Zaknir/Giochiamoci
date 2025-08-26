@@ -139,7 +139,8 @@
         <h2>Estrattore di Carte del Tesoro</h2>
         <button id="draw-button">Pesca una Carta</button>
         <div id="card-display" class="card" aria-live="polite">
-            <p><b>Mazzo pronto!</b>
+            <p><b>Mazzo pronto!</b><br>
+                Ci sono <span id="initial-cards-count"></span> carte da pescare.
             </p>
         </div>
         <button id="reset-button">Resetta il Mazzo</button>
@@ -154,7 +155,14 @@
                 <option value="combat">Combattimento</option>
             </select>
             <label id="dice-count-label" for="dice-count">Numero di dadi:</label>
-            <input type="number" id="dice-count" value="2" min="1" max="6" style="width: 60px;">
+            <select id="dice-count">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
             <button id="roll-button">Tira i Dadi</button>
         </div>
         <div id="dice-display" class="dice-display" aria-live="polite">
@@ -189,7 +197,7 @@
             const resetButton = document.getElementById('reset-button');
             const cardDisplay = document.getElementById('card-display');
             const diceTypeSelector = document.getElementById('dice-type');
-            const diceCountInput = document.getElementById('dice-count');
+            const diceCountSelector = document.getElementById('dice-count');
             const diceCountLabel = document.getElementById('dice-count-label');
             const rollButton = document.getElementById('roll-button');
             const diceDisplay = document.getElementById('dice-display');
@@ -242,7 +250,7 @@
             // Funzioni per il Lancio dei Dadi
             function rollDice() {
                 const diceType = diceTypeSelector.value;
-                const numDice = parseInt(diceCountInput.value);
+                const numDice = parseInt(diceCountSelector.value);
 
                 if (diceType === 'movement') {
                     let total = 0;
@@ -266,10 +274,7 @@
                         }
                     }
 
-                    diceDisplay.innerHTML = `<p><b>Attacco:</b><br>
-                        Teschi: ${skulls}<br>
-                        Scudi Bianchi: ${whiteShields}<br>
-                        Scudi Neri: ${blackShields}</p>`;
+                    diceDisplay.innerHTML = `<p><b>Attacco:</b><br><div class="dice-result"><span>Teschi: ${skulls}</span><span>Scudi Bianchi: ${whiteShields}</span><span>Scudi Neri: ${blackShields}</span></div></p>`;
                 }
             }
 
@@ -280,11 +285,9 @@
                 const type = event.target.value;
                 diceCountLabel.textContent = `Numero di dadi ${type === 'movement' ? 'di movimento' : 'di combattimento'}:`;
                 if (type === 'movement') {
-                    diceCountInput.value = 2;
-                    diceCountInput.setAttribute('max', 6);
+                    diceCountSelector.value = 2;
                 } else {
-                    diceCountInput.value = 1;
-                    diceCountInput.setAttribute('max', 10);
+                    diceCountSelector.value = 1;
                 }
             });
 
