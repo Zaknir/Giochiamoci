@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeroQuest - Estrattore di Carte</title>
+    <title>HeroQuest - Strumenti del Gioco</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f5f5dc; /* Sfondo "pergamena" */
-            color: #333; /* Testo scuro, per un alto contrasto */
+            background-color: #f5f5dc;
+            color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -23,7 +23,7 @@
 
         .container {
             text-align: center;
-            background-color: #f8f8e8; /* Contenitore leggermente più chiaro per distinzione */
+            background-color: #f8f8e8;
             padding: 30px 50px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -32,18 +32,19 @@
         }
 
         h1 {
-            color: #654321; /* Marrone scuro per il titolo */
+            color: #654321;
             margin-bottom: 5px;
         }
 
         h2 {
-            color: #6c7b8b; /* Grigio-blu per il sottotitolo */
+            color: #6c7b8b;
             margin-top: 0;
         }
 
-        .card {
-            background-color: #f5f5dc; /* Sfondo della carta come la pergamena */
-            border: 2px solid #654321; /* Bordo marrone scuro */
+        .card,
+        .dice-display {
+            background-color: #f5f5dc;
+            border: 2px solid #654321;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -54,7 +55,7 @@
         }
 
         .card h3 {
-            color: #b16c17; /* Tonalità di marrone per i titoli delle carte */
+            color: #b16c17;
             margin-top: 0;
         }
 
@@ -63,8 +64,24 @@
             line-height: 1.5;
         }
 
-        button {
-            background-color: #8b4513; /* Marrone sella per i pulsanti */
+        .dice-display {
+            min-height: 80px;
+        }
+
+        .dice-result {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        button,
+        select,
+        input[type="number"] {
+            background-color: #8b4513;
             color: #f2f2f2;
             border: none;
             padding: 12px 25px;
@@ -74,15 +91,39 @@
             cursor: pointer;
             transition: background-color 0.3s;
             margin: 5px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        select,
+        input[type="number"] {
+            background-color: #f5f5dc;
+            color: #333;
+            border: 2px solid #654321;
         }
 
         button:hover {
-            background-color: #654321; /* Marrone scuro al passaggio del mouse */
+            background-color: #654321;
         }
 
         button:disabled {
-            background-color: #ccc; /* Grigio chiaro per i pulsanti disabilitati */
+            background-color: #ccc;
             cursor: not-allowed;
+        }
+
+        .dice-options {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        label {
+            color: #654321;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -91,17 +132,34 @@
 
     <div class="container">
         <h1>HeroQuest</h1>
+        <h2>Strumenti del Gioco</h2>
+
+        <hr>
+
         <h2>Estrattore di Carte del Tesoro</h2>
-
         <button id="draw-button">Pesca una Carta</button>
-
         <div id="card-display" class="card" aria-live="polite">
-            <p><b>Mazzo pronto!</b><br>
-                Ci sono <span id="initial-cards-count"></span> carte da pescare.
+            <p><b>Mazzo pronto!</b>
             </p>
         </div>
-
         <button id="reset-button">Resetta il Mazzo</button>
+
+        <hr>
+
+        <h2>Lancio dei Dadi</h2>
+        <div class="dice-options">
+            <label for="dice-type">Seleziona il tipo di lancio:</label>
+            <select id="dice-type">
+                <option value="movement">Movimento</option>
+                <option value="combat">Combattimento</option>
+            </select>
+            <label id="dice-count-label" for="dice-count">Numero di dadi:</label>
+            <input type="number" id="dice-count" value="2" min="1" max="6" style="width: 60px;">
+            <button id="roll-button">Tira i Dadi</button>
+        </div>
+        <div id="dice-display" class="dice-display" aria-live="polite">
+            <p>Scegli il tipo di lancio e premi "Tira i Dadi".</p>
+        </div>
     </div>
 
     <script>
@@ -113,7 +171,6 @@
                 { nome: "Gioielli", descrizione: "Un bauletto contenente preziosi del valore di 50 monete.", quantità: 1, tipo: "oro" },
                 { nome: "Infuso Eroico", descrizione: "Il tuo eroe può effettuare due attacchi questo turno.", quantità: 1, tipo: "oggetto" },
                 { nome: "Mostro Errante", descrizione: "Un mostro compare in un riquadro adiacente e ti attacca!", quantità: 5, tipo: "sfortuna" },
-                /*{ nome: "Niente", descrizione: "Nonostante tu abbia cercato ovunque, non hai trovato nulla.", quantità: 1, tipo: "oggetto" },*/
                 { nome: "Oro", descrizione: "Un borsello contenente 10 monete.", quantità: 2, tipo: "oro" },
                 { nome: "Oro", descrizione: "Un borsello contenente 20 monete.", quantità: 1, tipo: "oro" },
                 { nome: "Oro", descrizione: "Un borsello contenente 25 monete.", quantità: 2, tipo: "oro" },
@@ -128,12 +185,16 @@
             ];
 
             let availableCards = [];
-            let drawnCard = null;
-
             const drawButton = document.getElementById('draw-button');
             const resetButton = document.getElementById('reset-button');
             const cardDisplay = document.getElementById('card-display');
+            const diceTypeSelector = document.getElementById('dice-type');
+            const diceCountInput = document.getElementById('dice-count');
+            const diceCountLabel = document.getElementById('dice-count-label');
+            const rollButton = document.getElementById('roll-button');
+            const diceDisplay = document.getElementById('dice-display');
 
+            // Funzioni per l'Estrattore di Carte
             function buildDeck() {
                 availableCards = [];
                 cardDefinitions.forEach(card => {
@@ -151,7 +212,7 @@
                 }
 
                 const randomIndex = Math.floor(Math.random() * availableCards.length);
-                drawnCard = availableCards[randomIndex];
+                const drawnCard = availableCards[randomIndex];
 
                 let cardMessage = '';
                 if (drawnCard.tipo === 'sfortuna') {
@@ -178,11 +239,60 @@
             drawButton.addEventListener('click', drawCard);
             resetButton.addEventListener('click', resetDeck);
 
+            // Funzioni per il Lancio dei Dadi
+            function rollDice() {
+                const diceType = diceTypeSelector.value;
+                const numDice = parseInt(diceCountInput.value);
+
+                if (diceType === 'movement') {
+                    let total = 0;
+                    for (let i = 0; i < numDice; i++) {
+                        total += Math.floor(Math.random() * 6) + 1;
+                    }
+                    diceDisplay.innerHTML = `<p><b>Movimento:</b><br><span class="dice-result">${total}</span></p>`;
+                } else if (diceType === 'combat') {
+                    let skulls = 0;
+                    let whiteShields = 0;
+                    let blackShields = 0;
+
+                    for (let i = 0; i < numDice; i++) {
+                        const roll = Math.floor(Math.random() * 6) + 1;
+                        if (roll === 1 || roll === 2 || roll === 3) {
+                            skulls++;
+                        } else if (roll === 4 || roll === 5) {
+                            whiteShields++;
+                        } else { // roll === 6
+                            blackShields++;
+                        }
+                    }
+
+                    diceDisplay.innerHTML = `<p><b>Attacco:</b><br><div class="dice-result"><span>Teschi: ${skulls}</span><span>Scudi Bianchi: ${whiteShields}</span><span>Scudi Neri: ${blackShields}</span></div></p>`;
+                }
+            }
+
+            rollButton.addEventListener('click', rollDice);
+
+            // Gestione dell'interfaccia utente in base al tipo di dado
+            diceTypeSelector.addEventListener('change', (event) => {
+                const type = event.target.value;
+                diceCountLabel.textContent = `Numero di dadi ${type === 'movement' ? 'di movimento' : 'di combattimento'}:`;
+                if (type === 'movement') {
+                    diceCountInput.value = 2;
+                    diceCountInput.setAttribute('max', 6);
+                } else {
+                    diceCountInput.value = 1;
+                    diceCountInput.setAttribute('max', 10);
+                }
+            });
+
+            // Avvia la pagina
             buildDeck();
             document.getElementById('initial-cards-count').textContent = availableCards.length;
+            diceCountLabel.textContent = 'Numero di dadi di movimento:';
         });
     </script>
 </body>
 
 </html>
+
 
